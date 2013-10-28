@@ -17,3 +17,10 @@ All sound effects are non-attribution cc.
 The ambience.ogg main background track is from freesounds.  Attribution: sound from http://www.freesound.org/people/klankbeeld/
 
 The font 'Middle Saxony Text' is by Dieter Steffmann and is free to use.
+
+TODO
+=======
+
+* Add timer
+* Add scoring system
+* Add more words (online dictionary?)
