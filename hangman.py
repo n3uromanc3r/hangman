@@ -4,10 +4,7 @@ import os,sys,pygame,random
 # Name of application
 appname='hangman'
 
-# Build word pool
-wordPool = 'ant baboon badger bat bear beaver camel cat clam cobra cougar coyote crow deer dog donkey duck eagle ferret fox frog goat goose hawk lion lizard llama mole monkey moose mouse mule newt otter owl panda parrot pigeon python rabbit ram rat raven rhino salmon seal shark sheep skunk sloth snake spider stork swan tiger toad trout turkey turtle weasel whale wolf wombat zebra'.split()
-
-# Decalre game variables
+# Declare game variables
 incorrectLetters = ''
 correctLetters = ''
 gameOver = False
@@ -19,12 +16,11 @@ def reset():
 	correctLetters = ''
 	gameOver = False
 	won = False
-	secretWord = getRandomWord(wordPool)
+	secretWord = getRandomWord()
 
-# Get a random word from pool
-def getRandomWord(wordPool):
-	wordIndex = random.randint(0, len(wordPool) - 1)
-	return wordPool[wordIndex]
+# Get a random word from wordlist file
+def getRandomWord():
+	return random.choice(list(open(assets_dir+"wordlist.txt"))).strip()
 
 # Display the hangman
 def overlayHangman():
@@ -121,7 +117,7 @@ except:
 
 pygame.mixer.music.play(-1)
 
-secretWord = getRandomWord(wordPool)
+secretWord = getRandomWord()
 drawScreen()
 
 # Main loop
@@ -146,7 +142,7 @@ while True:
 					correctLetters = ''
 					gameOver = False
 					won = False
-					secretWord = getRandomWord(wordPool)
+					secretWord = getRandomWord()
 					drawScreen()
 				# Quit
 				elif keyPressed == 'n':
