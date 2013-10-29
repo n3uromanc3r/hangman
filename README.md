@@ -3,7 +3,7 @@ Hangman
 
 A python2 game, built using the pygame library
 
-![Screenshot taken Oct 28 2013](http://i.imgur.com/UgYE58C.png)
+![Screenshot taken Oct 28 2013](http://i.imgur.com/sQMOIjF.png)
 
 Tested on Elementary OS Beta
 
