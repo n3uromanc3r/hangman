@@ -21,6 +21,5 @@ The font 'Middle Saxony Text' is by Dieter Steffmann and is free to use.
 TODO
 =======
 
-* Add timer
 * Add scoring system
 * Add more words (online dictionary?)
