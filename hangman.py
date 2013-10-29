@@ -4,19 +4,16 @@ import os,sys,pygame,random
 # Name of application
 appname='hangman'
 
-# Declare game variables
-incorrectLetters = ''
-correctLetters = ''
-gameOver = False
-won = False
 
 # Reset game variables
 def reset():
+	global incorrectLetters, correctLetters, gameOver, won, secretWord, frameCount
 	incorrectLetters = ''
 	correctLetters = ''
 	gameOver = False
 	won = False
 	secretWord = getRandomWord()
+	frameCount = 0
 
 # Get a random word from wordlist file
 def getRandomWord():
@@ -80,6 +77,18 @@ def drawScreen(gameOver=False):
 	side3pos = side3.get_rect().move(320,260)
 	background.blit(side3, side3pos)
 
+	# Timer
+	# Calculate total seconds
+	totalSeconds = frameCount // frameRate
+	minutes = totalSeconds // 60
+	# Use modulus (remainder) to get seconds
+	seconds = totalSeconds % 60
+	# Use python string formatting to format in leading zeros
+	outputString = "{0:02}:{1:02}".format(minutes,seconds)
+	if (frameCount > 0):
+		timeString = font2.render(outputString,True,(60,60,60))
+		background.blit(timeString, [575,440])
+
 	# Blit everything to the window
 	window.blit(background, (0, 0))
 
@@ -102,6 +111,10 @@ icon = pygame.image.load(i_icon)
 pygame.display.set_caption(appname.title(), i_icon)
 pygame.display.set_icon(icon)
 
+# Clock init
+clock=pygame.time.Clock()
+frameRate = 20
+
 # Initialise the screen
 window = pygame.display.set_mode((640, 480))
 
@@ -117,11 +130,24 @@ except:
 
 pygame.mixer.music.play(-1)
 
-secretWord = getRandomWord()
-drawScreen()
+
+reset()
 
 # Main loop
 while True:
+
+	# Only run the timer after the first guess in a live game
+	if (((len(incorrectLetters) > 0) or (len(correctLetters) > 0)) and (gameOver == False)):
+		frameCount += 1
+		# Limit to 20 frames per second
+		clock.tick(frameRate)
+	
+	# Draw contextual screen
+	if gameOver:
+		drawScreen(True)
+	else:
+		drawScreen()
+
 	# Check for pygame event
 	for event in pygame.event.get():
 
@@ -138,11 +164,7 @@ while True:
 			if gameOver:
 				# Reset and play again
 				if keyPressed == 'y':
-					incorrectLetters = ''
-					correctLetters = ''
-					gameOver = False
-					won = False
-					secretWord = getRandomWord()
+					reset()
 					drawScreen()
 				# Quit
 				elif keyPressed == 'n':
@@ -179,10 +201,4 @@ while True:
 						won = False
 						dead.play()
 					else:
-						incorrect.play()
-
-				# Draw contextual screen
-				if gameOver:
-					drawScreen(True)
-				else:
-					drawScreen()
+						incorrect.play()				
