@@ -156,8 +156,8 @@ while True:
 		if event.type == pygame.QUIT: 
 			sys.exit(0)
 
-		# Keydown event
-		elif event.type == pygame.KEYDOWN:
+		# Keydown event (making sure our key id is within character evaluation range)
+		elif ((event.type == pygame.KEYDOWN) and (event.key <= 256)):
 			# Get character from key id
 			keyPressed = chr(event.key)
 
