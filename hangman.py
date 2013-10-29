@@ -121,6 +121,7 @@ window = pygame.display.set_mode((640, 480))
 # Initialise our sounds
 try:
 	pygame.mixer.music.load(os.path.join(assets_dir, 'ambience.ogg'))
+	start = pygame.mixer.Sound(os.path.join(assets_dir,'gong.ogg'))
 	correct = pygame.mixer.Sound(os.path.join(assets_dir,'phew.ogg'))
 	incorrect = pygame.mixer.Sound(os.path.join(assets_dir,'rope-tighten.ogg'))
 	dead = pygame.mixer.Sound(os.path.join(assets_dir,'dead.ogg'))
@@ -130,8 +131,8 @@ except:
 
 pygame.mixer.music.play(-1)
 
-
 reset()
+start.play()
 
 # Main loop
 while True:
@@ -165,7 +166,7 @@ while True:
 				# Reset and play again
 				if keyPressed == 'y':
 					reset()
-					drawScreen()
+					start.play()
 				# Quit
 				elif keyPressed == 'n':
 					sys.exit(0) 
