@@ -7,6 +7,14 @@ A python2 game, built using the pygame library
 
 Tested on Elementary OS Beta
 
+Features
+=======
+
+* Nearly 400 available words to play
+* In-Game timer
+* SuperAwesome Sound FX!™
+* All new artwork
+
 Assets
 =======
 
