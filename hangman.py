@@ -1,19 +1,20 @@
 #!/usr/bin/python
 import os,sys,pygame,random
+from pygame.locals import *
 
 # Name of application
 appname='hangman'
 
-
 # Reset game variables
 def reset():
-	global incorrectLetters, correctLetters, gameOver, won, secretWord, frameCount
+	global incorrectLetters, correctLetters, gameOver, won, secretWord, frameCount, milliseconds
 	incorrectLetters = ''
 	correctLetters = ''
 	gameOver = False
 	won = False
 	secretWord = getRandomWord()
 	frameCount = 0
+	milliseconds = 000
 
 # Get a random word from wordlist file
 def getRandomWord():
@@ -36,7 +37,7 @@ def overlayHangman():
 		leg1 = pygame.draw.line(window, (0,0,0), (233,300), (208,260), 8)
 
 # Draw screen
-def drawScreen(gameOver=False):
+def drawScreen():
 	# Prepare word to display
 	blanks = '_' * len(secretWord)
 
@@ -82,12 +83,13 @@ def drawScreen(gameOver=False):
 	totalSeconds = frameCount // frameRate
 	minutes = totalSeconds // 60
 	# Use modulus (remainder) to get seconds
-	seconds = totalSeconds % 60
+	seconds = totalSeconds % 60	
+
 	# Use python string formatting to format in leading zeros
-	outputString = "{0:02}:{1:02}".format(minutes,seconds)
+	outputString = "{0:02}:{1:02}:{2:02}".format(minutes,seconds, milliseconds)
 	if (frameCount > 0):
 		timeString = font2.render(outputString,True,(60,60,60))
-		background.blit(timeString, [575,440])
+		background.blit(timeString, [555,440])
 
 	# Blit everything to the window
 	window.blit(background, (0, 0))
@@ -113,10 +115,10 @@ pygame.display.set_icon(icon)
 
 # Clock init
 clock=pygame.time.Clock()
-frameRate = 20
+frameRate = 42
 
 # Initialise the screen
-window = pygame.display.set_mode((640, 480))
+window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
 
 # Initialise our sounds
 try:
@@ -133,21 +135,21 @@ pygame.mixer.music.play(-1)
 
 reset()
 start.play()
+count = 0
 
 # Main loop
 while True:
 
 	# Only run the timer after the first guess in a live game
 	if (((len(incorrectLetters) > 0) or (len(correctLetters) > 0)) and (gameOver == False)):
-		frameCount += 1
+		frameCount += 1		
+		# Given that our fps is not 100, we need to use some framerate that is not exactly divisible by 100, to get some millisecond approximation in our calculation
+		milliseconds = int((frameCount * 2.380952381) % 100) 
 		# Limit to 20 frames per second
 		clock.tick(frameRate)
 	
-	# Draw contextual screen
-	if gameOver:
-		drawScreen(True)
-	else:
-		drawScreen()
+	# Draw screen
+	drawScreen()
 
 	# Check for pygame event
 	for event in pygame.event.get():
