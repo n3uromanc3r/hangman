@@ -11,7 +11,7 @@ def reset():
 	incorrect_letters = correct_letters = modal_context = ''
 	game_over = won = modal = target = False
 	secret_word = get_random_word()
-	#print secret_word
+	print secret_word
 	frame_count = milliseconds = 0
 
 # Get a random word from wordlist file
@@ -63,7 +63,7 @@ def overlay_modal():
 			# ... else we have multiple scores
 			else:
 				# Add sub-title
-				blit_text(str(scoreboard_to_show_key)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+				blit_text(str(current_scoreboard_wordcount)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
 				# Get scores based on word length
 				for i, score in enumerate(scoreboard_to_show):			
 					blit_text("{0:02}".format(i+1) + '. ' + score[0] + ' - ' + score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
@@ -261,8 +261,9 @@ play_sounds = data['sound_settings']
 hi_scores = data['hi_scores']
 # Grab the first available scoreboard, which gets displayed when accessing the scores modal
 if len(hi_scores.keys()) > 0:
-	scoreboard_to_show_key = hi_scores.iterkeys().next()
-	scoreboard_to_show = hi_scores[scoreboard_to_show_key]
+	scoreboard_to_show_key = 0
+	scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
+	current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
 else:
 	scoreboard_to_show_key = None
 	scoreboard_to_show = None
@@ -334,14 +335,22 @@ while True:
 					modal_context = 'scoreboards'
 
 			# Scroll down
-			if (event.button == 4) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 0):
-				scoreboard_to_show_key = (scoreboard_to_show_key-1) if (scoreboard_to_show_key-1) in hi_scores else hi_scores.keys().pop()
-				scoreboard_to_show = hi_scores[scoreboard_to_show_key]
+			if (event.button == 4) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 1):
+				if scoreboard_to_show_key > 0:
+					scoreboard_to_show_key = (scoreboard_to_show_key-1) if (hi_scores.keys()[scoreboard_to_show_key-1]) in hi_scores.keys() else (len(hi_scores.keys())-1)
+				else:
+					scoreboard_to_show_key = len(hi_scores.keys()) -1
+				current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
+				scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
 
-			# Scroll up
-			if (event.button == 5) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 0):
-				scoreboard_to_show_key = (scoreboard_to_show_key+1) if (scoreboard_to_show_key+1) in hi_scores else hi_scores.iterkeys().next()
-				scoreboard_to_show = hi_scores[scoreboard_to_show_key]
+			# Scroll down
+			if (event.button == 5) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 1):
+				if scoreboard_to_show_key < len(hi_scores.keys()) - 1:
+					scoreboard_to_show_key = (scoreboard_to_show_key+1) if (hi_scores.keys()[scoreboard_to_show_key+1]) in hi_scores.keys() else 0
+				else:
+					scoreboard_to_show_key = 0
+				current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
+				scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
 
 		# Keydown event (making sure our key id is within character evaluation range)
 		elif ((event.type == pygame.KEYDOWN) and (event.key <= 256)):
