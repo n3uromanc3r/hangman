@@ -14,6 +14,7 @@ Features
 * In-Game timer
 * SuperAwesome Sound FX!™
 * All new artwork
+* Leaderboards
 
 Assets
 =======
@@ -29,5 +30,6 @@ The font 'Middle Saxony Text' is by Dieter Steffmann and is free to use.
 TODO
 =======
 
-* Add scoring system
+* Extend online scoring system to include online leaderboards
+* Add word-type selection on start-up (maintain separate wordlist files)
 * Add more words (online dictionary?)
