@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os,sys,pygame,random, shelve, getpass
+import os, sys, pygame, random, shelve, getpass
 from pygame.locals import *
 
 # Name of application
@@ -84,6 +84,25 @@ def blit_text(text, color, position, surface, font, centered=None):
 	if centered == True:
 		text_to_blit_position.centerx = surface.get_rect().centerx
 	surface.blit(text_to_blit, text_to_blit_position)
+
+# Cycle scoreboards
+def previous_scoreboard():
+	global scoreboard_to_show_key, scoreboard_to_show, current_scoreboard_wordcount
+	if scoreboard_to_show_key > 0:
+		scoreboard_to_show_key = (scoreboard_to_show_key-1) if (hi_scores.keys()[scoreboard_to_show_key-1]) in hi_scores.keys() else (len(hi_scores.keys())-1)
+	else:
+		scoreboard_to_show_key = len(hi_scores.keys()) -1
+	current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
+	scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
+
+def next_scoreboard():
+	global scoreboard_to_show_key, scoreboard_to_show, current_scoreboard_wordcount
+	if scoreboard_to_show_key < len(hi_scores.keys()) - 1:
+		scoreboard_to_show_key = (scoreboard_to_show_key+1) if (hi_scores.keys()[scoreboard_to_show_key+1]) in hi_scores.keys() else 0
+	else:
+		scoreboard_to_show_key = 0
+	current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
+	scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
 
 # Draw screen
 def draw_screen():
@@ -334,23 +353,19 @@ while True:
 					modal = True
 					modal_context = 'scoreboards'
 
-			# Scroll down
+			# Scroll up 
 			if (event.button == 4) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 1):
-				if scoreboard_to_show_key > 0:
-					scoreboard_to_show_key = (scoreboard_to_show_key-1) if (hi_scores.keys()[scoreboard_to_show_key-1]) in hi_scores.keys() else (len(hi_scores.keys())-1)
-				else:
-					scoreboard_to_show_key = len(hi_scores.keys()) -1
-				current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
-				scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
+				previous_scoreboard()
 
 			# Scroll down
 			if (event.button == 5) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 1):
-				if scoreboard_to_show_key < len(hi_scores.keys()) - 1:
-					scoreboard_to_show_key = (scoreboard_to_show_key+1) if (hi_scores.keys()[scoreboard_to_show_key+1]) in hi_scores.keys() else 0
-				else:
-					scoreboard_to_show_key = 0
-				current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
-				scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
+				next_scoreboard()
+
+		# Up/Down cycle scoreboards
+		elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_UP) and (modal_context == 'scoreboards'):
+			previous_scoreboard()
+		elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_DOWN) and (modal_context == 'scoreboards'):
+			next_scoreboard()
 
 		# Keydown event (making sure our key id is within character evaluation range)
 		elif ((event.type == pygame.KEYDOWN) and (event.key <= 256)):
@@ -364,12 +379,13 @@ while True:
 					hi_scores = db.save(hi_scores)
 					scoreboard_to_show_key = hi_scores.iterkeys().next()
 					scoreboard_to_show = hi_scores[scoreboard_to_show_key]
+					current_scoreboard_wordcount = len(secret_word)
 					modal = False
 					modal_context = ''
 				elif (event.key == pygame.K_BACKSPACE) and (modal_context == 'submit_score'):
 					current_user_temp = current_user_temp[:-1]
-				elif key_pressed in 'abcdefghijklmnopqrstuvwxyz0123456789':
-					current_user_temp = current_user_temp + key_pressed
+				elif (key_pressed in 'abcdefghijklmnopqrstuvwxyz0123456789') and (modal_context == 'submit_score'):
+					current_user_temp = current_user_temp + key_pressed				
 				elif event.key == pygame.K_ESCAPE:
 					current_user_temp = current_user
 					modal = False
