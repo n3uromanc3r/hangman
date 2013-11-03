@@ -55,16 +55,19 @@ def overlay_modal():
 		if (len(hi_scores.keys()) > 0):
 			# If we only have a single score
 			if (len(hi_scores.keys()) == 1):
+				# Add sub-title
+				blit_text(str(hi_scores.keys()[0])+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+				# Get scores based on word length
 				single_score = hi_scores[hi_scores.keys()[0]][0]
 				blit_text('01. ' + single_score[0] + ' - ' + single_score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
 			# ... else we have multiple scores
 			else:
+				# Add sub-title
+				blit_text(str(scoreboard_to_show_key)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
 				# Get scores based on word length
 				for i, score in enumerate(scoreboard_to_show):			
 					blit_text("{0:02}".format(i+1) + '. ' + score[0] + ' - ' + score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
-					score_pos_y += 25
-				# Add sub-title
-				blit_text(str(scoreboard_to_show_key)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+					score_pos_y += 25				
 		else:
 			blit_text("It's looking pretty empty in here!", (255, 0, 0), (0, 95), window, font2, True)
 		# Add footer
