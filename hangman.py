@@ -11,6 +11,7 @@ def reset():
 	incorrect_letters = correct_letters = modal_context = ''
 	game_over = won = modal = target = False
 	secret_word = get_random_word()
+	#print secret_word
 	frame_count = milliseconds = 0
 
 # Get a random word from wordlist file
@@ -51,12 +52,19 @@ def overlay_modal():
 
 	if modal_context == 'scoreboards':
 		score_pos_y = 150
-		# Get scores based on word length
-		for i, score in enumerate(scoreboard_to_show):			
-			blit_text("{0:02}".format(i+1) + '. ' + score[0] + ' - ' + score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
-			score_pos_y += 25
-		# Add sub-title
-		blit_text(str(scoreboard_to_show_key)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+		if (len(hi_scores.keys()) > 0):
+			# If we only have a single score
+			if (len(hi_scores.keys()) == 1):
+				single_score = hi_scores[hi_scores.keys()[0]][0]
+				blit_text('01. ' + single_score[0] + ' - ' + single_score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
+			# ... else we have multiple scores
+			else:
+				# Get scores based on word length
+				for i, score in enumerate(scoreboard_to_show):			
+					blit_text("{0:02}".format(i+1) + '. ' + score[0] + ' - ' + score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
+					score_pos_y += 25
+				# Add sub-title
+				blit_text(str(scoreboard_to_show_key)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
 		# Add footer
 		blit_text("Use the mouse wheel to cycle scoreboards.  Press esc to close.", (60, 60, 60), (0, 430), window, font2, True)
 
@@ -156,7 +164,7 @@ class Database:
 		else:
 			hi_scores = {}
 			sound_settings = True
-			current_user = getpass.getuser().title()
+			current_user = getpass.getuser()
 
 			# First run save			
 			data['sound_settings'] = sound_settings
@@ -247,8 +255,12 @@ play_sounds = data['sound_settings']
 # Load any existing scores from db
 hi_scores = data['hi_scores']
 # Grab the first available scoreboard, which gets displayed when accessing the scores modal
-scoreboard_to_show_key = hi_scores.iterkeys().next()
-scoreboard_to_show = hi_scores[scoreboard_to_show_key]
+if len(hi_scores.keys()) > 0:
+	scoreboard_to_show_key = hi_scores.iterkeys().next()
+	scoreboard_to_show = hi_scores[scoreboard_to_show_key]
+else:
+	scoreboard_to_show_key = None
+	scoreboard_to_show = None
 
 # Get current game user
 current_user = data['current_user']
@@ -317,12 +329,12 @@ while True:
 					modal_context = 'scoreboards'
 
 			# Scroll down
-			if (event.button == 4) and (modal == True) and (modal_context == 'scoreboards'):
+			if (event.button == 4) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 0):
 				scoreboard_to_show_key = (scoreboard_to_show_key-1) if (scoreboard_to_show_key-1) in hi_scores else hi_scores.keys().pop()
 				scoreboard_to_show = hi_scores[scoreboard_to_show_key]
 
 			# Scroll up
-			if (event.button == 5) and (modal == True) and (modal_context == 'scoreboards'):
+			if (event.button == 5) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 0):
 				scoreboard_to_show_key = (scoreboard_to_show_key+1) if (scoreboard_to_show_key+1) in hi_scores else hi_scores.iterkeys().next()
 				scoreboard_to_show = hi_scores[scoreboard_to_show_key]
 
@@ -336,6 +348,8 @@ while True:
 					# Save Hi-Scores
 					current_user = current_user_temp
 					hi_scores = db.save(hi_scores)
+					scoreboard_to_show_key = hi_scores.iterkeys().next()
+					scoreboard_to_show = hi_scores[scoreboard_to_show_key]
 					modal = False
 					modal_context = ''
 				elif (event.key == pygame.K_BACKSPACE) and (modal_context == 'submit_score'):
