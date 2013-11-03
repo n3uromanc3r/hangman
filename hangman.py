@@ -65,6 +65,8 @@ def overlay_modal():
 					score_pos_y += 25
 				# Add sub-title
 				blit_text(str(scoreboard_to_show_key)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+		else:
+			blit_text("It's looking pretty empty in here!", (255, 0, 0), (0, 95), window, font2, True)
 		# Add footer
 		blit_text("Use the mouse wheel to cycle scoreboards.  Press esc to close.", (60, 60, 60), (0, 430), window, font2, True)
 
