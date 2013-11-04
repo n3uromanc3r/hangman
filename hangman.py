@@ -368,7 +368,7 @@ while True:
 			next_scoreboard()
 
 		# Keydown event (making sure our key id is within character evaluation range)
-		elif ((event.type == pygame.KEYDOWN) and (event.key <= 256)):
+		elif ((event.type == pygame.KEYDOWN) and (event.key < 256)):
 			# Get character from key id
 			key_pressed = chr(event.key)
 
