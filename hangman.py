@@ -16,7 +16,7 @@ def reset():
 
 # Get a random word from wordlist file
 def get_random_word():
-	return random.choice(list(open(assets_dir+"wordlist.txt"))).strip()
+	return random.choice(list(open(wordlists_dir+(random.choice(['easy','medium','hard']) if game_difficulty == 'random' else game_difficulty)+".txt"))).strip()
 
 # Display the hangman
 def overlay_hangman():
@@ -56,14 +56,14 @@ def overlay_modal():
 			# If we only have a single score
 			if (len(hi_scores.keys()) == 1):
 				# Add sub-title
-				blit_text(str(hi_scores.keys()[0])+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+				blit_text(str(hi_scores.keys()[0])+" letter words ("+difficulty(hi_scores.keys()[0])+")", (255, 0, 0), (0, 95), window, font2, True)
 				# Get scores based on word length
 				single_score = hi_scores[hi_scores.keys()[0]][0]
 				blit_text('01. ' + single_score[0] + ' - ' + single_score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
 			# ... else we have multiple scores
 			else:
 				# Add sub-title
-				blit_text(str(current_scoreboard_wordcount)+" letter words", (255, 0, 0), (0, 95), window, font2, True)
+				blit_text(str(current_scoreboard_wordcount)+" letter words ("+difficulty(current_scoreboard_wordcount)+")", (255, 0, 0), (0, 95), window, font2, True)
 				# Get scores based on word length
 				for i, score in enumerate(scoreboard_to_show):			
 					blit_text("{0:02}".format(i+1) + '. ' + score[0] + ' - ' + score[1], (255, 255, 255), (50, score_pos_y), window, font2, True)
@@ -73,16 +73,36 @@ def overlay_modal():
 		# Add footer
 		blit_text("Use the mouse wheel to cycle scoreboards.  Press esc to close.", (60, 60, 60), (0, 430), window, font2, True)
 
+	if modal_context == 'choose_difficulty':		
+		option_pos_y = 170
+		for option in difficulties:
+			blit_text(option, (255, 255, 255), (50, option_pos_y), window, font2, True, option == highlighted)
+			option_pos_y += 40
+		# Add footer
+		blit_text("Use the mouse or up/down/enter to select a difficulty.", (60, 60, 60), (0, 430), window, font2, True)
+
+# Return difficulty for word length
+def difficulty(word_length):
+	if word_length < 5:
+		return 'easy'
+	elif word_length < 7:
+		return 'medium'
+	else:
+		return 'hard'
+
+# Blink cursor
 def blink():
 	global blinking_cursor
 	blinking_cursor = '_' if blinking_cursor == ' ' else ' '
 
 # Blit text to the screen
-def blit_text(text, color, position, surface, font, centered=None):
+def blit_text(text, color, position, surface, font, centered=None, highlight=None):
 	text_to_blit = font.render(text, 1, color)
 	text_to_blit_position = text_to_blit.get_rect().move(position)
 	if centered == True:
 		text_to_blit_position.centerx = surface.get_rect().centerx
+	if highlight:
+		pygame.draw.rect(window, (255,0,0), text_to_blit_position.inflate(10,10), 0)
 	surface.blit(text_to_blit, text_to_blit_position)
 
 # Cycle scoreboards
@@ -104,6 +124,22 @@ def next_scoreboard():
 	current_scoreboard_wordcount = hi_scores.keys()[scoreboard_to_show_key]
 	scoreboard_to_show = hi_scores[hi_scores.keys()[scoreboard_to_show_key]]
 
+# Cycle difficulty options
+def previous_option():
+	global highlighted
+	current_index = difficulties.index(highlighted)
+	if current_index > 0:
+		highlighted = difficulties[current_index-1]
+	else:
+		highlighted = difficulties[len(difficulties) -1]
+def next_option():
+	global highlighted
+	current_index = difficulties.index(highlighted)
+	if current_index < len(difficulties) - 1:
+		highlighted = difficulties[current_index+1]
+	else:
+		highlighted = difficulties[0]
+
 # Draw screen
 def draw_screen():
 	# Prepare word to display
@@ -117,16 +153,16 @@ def draw_screen():
 			blanks = secret_word
 
 	# Fill background
-	background = pygame.image.load(assets_dir+'bg.png').convert()
+	background = pygame.image.load(images_dir+'bg.png').convert()
 
 	# Show Volume and Score buttons if mouse is in window
 	if pygame.mouse.get_focused():
 		global volume
 		sound_icon = ('sound-off.png' if play_sounds else 'sound-on-over.png') if (target == 'sound_switch') else ('sound-on.png' if play_sounds else 'sound-off.png')
-		volume = pygame.image.load(assets_dir+sound_icon).convert_alpha()
+		volume = pygame.image.load(images_dir+sound_icon).convert_alpha()
 		background.blit(volume, (570,438))
 		score_icon = 'score-over.png' if (target == 'scoreboards') else 'score.png'
-		score = pygame.image.load(assets_dir+score_icon).convert_alpha()
+		score = pygame.image.load(images_dir+score_icon).convert_alpha()
 		background.blit(score, (600,438))
 
 	# Display title	
@@ -168,12 +204,32 @@ def draw_screen():
 
 # Returns any objects of interest, currently under the cursor
 def get_mouse_target():
+	global highlighted
 	mouse_pos = pygame.mouse.get_pos()
 	if pygame.Rect(570,438,24,24).collidepoint(mouse_pos):
 		return 'sound_switch'
 	if pygame.Rect(600,438,24,24).collidepoint(mouse_pos):
 		return 'scoreboards'
+	if pygame.Rect(285, 165, 70, 31).collidepoint(mouse_pos):
+		highlighted = 'random'
+		return 'random'
+	if pygame.Rect(297, 205, 47, 31).collidepoint(mouse_pos):
+		highlighted = 'easy'
+		return 'easy'
+	if pygame.Rect(284, 245, 72, 31).collidepoint(mouse_pos):
+		highlighted = 'medium'
+		return 'medium'
+	if pygame.Rect(298, 285, 45, 31).collidepoint(mouse_pos):
+		highlighted = 'hard'
+		return 'hard'
 	return None
+
+def set_difficulty(choice):
+	global game_difficulty
+	game_difficulty = choice
+	reset()
+	modal = False
+	modal_context = ''
 
 # Define database class
 class Database:
@@ -245,14 +301,18 @@ pygame.init()
 
 hangman_dir = os.path.dirname(os.path.realpath(__file__))+'/'
 assets_dir = hangman_dir+'assets/'
+fonts_dir = assets_dir+'fonts/'
+sounds_dir = assets_dir+'sounds/'
+images_dir = assets_dir+'images/'
+wordlists_dir = assets_dir+'wordlists/'
 
-i_icon = assets_dir+"icon.png"
+i_icon = assets_dir+"images/icon.png"
 icon = pygame.image.load(i_icon)
 pygame.display.set_caption(app_name.title(), i_icon)
 pygame.display.set_icon(icon)
 
 # Define fonts
-middst = pygame.font.Font(assets_dir+'middst.ttf', 56)
+middst = pygame.font.Font(fonts_dir+'middst.ttf', 56)
 font2 = pygame.font.Font(None, 24)
 monospace = pygame.font.SysFont("monospace", 60)
 
@@ -293,21 +353,27 @@ current_user_temp = current_user
 
 # Initialise our sounds
 try:
-	pygame.mixer.music.load(os.path.join(assets_dir, 'ambience.ogg'))
-	start = pygame.mixer.Sound(os.path.join(assets_dir,'gong.ogg'))
-	correct = pygame.mixer.Sound(os.path.join(assets_dir,'phew.ogg'))
-	incorrect = pygame.mixer.Sound(os.path.join(assets_dir,'rope-tighten.ogg'))
-	dead = pygame.mixer.Sound(os.path.join(assets_dir,'dead.ogg'))
-	alive = pygame.mixer.Sound(os.path.join(assets_dir,'yeehaw.ogg'))
+	pygame.mixer.music.load(os.path.join(sounds_dir, 'ambience.ogg'))
+	start = pygame.mixer.Sound(os.path.join(sounds_dir,'gong.ogg'))
+	correct = pygame.mixer.Sound(os.path.join(sounds_dir,'phew.ogg'))
+	incorrect = pygame.mixer.Sound(os.path.join(sounds_dir,'rope-tighten.ogg'))
+	dead = pygame.mixer.Sound(os.path.join(sounds_dir,'dead.ogg'))
+	alive = pygame.mixer.Sound(os.path.join(sounds_dir,'yeehaw.ogg'))
 except:
-	raise UserWarning, "could not load or play soundfiles in 'data' folder :-("
+	raise UserWarning, "could not load or play soundfiles"
 
 # Play background music
 if play_sounds:
 	pygame.mixer.music.play(-1)
 
-# Begin game
+# Begin game, default the game to random difficulty but give the user the option to change this
+difficulties = ['random','easy','medium','hard']
+game_difficulty = highlighted = 'random'
 reset()
+
+# Cue up game difficulty selection modal
+modal = True
+modal_context = 'choose_difficulty'
 
 # Start background music
 if play_sounds:
@@ -337,6 +403,7 @@ while True:
 		if event.type == pygame.QUIT:
 			sys.exit(0)
 
+		# Process blink event timer
 		if event.type == USEREVENT+1:
 			blink()
 
@@ -351,7 +418,9 @@ while True:
 				# Clicked scoreboards button
 				if target == 'scoreboards':
 					modal = True
-					modal_context = 'scoreboards'
+					modal_context = 'scoreboards'	
+				if target in difficulties:
+					set_difficulty(str(target))
 
 			# Scroll up 
 			if (event.button == 4) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 1):
@@ -361,11 +430,15 @@ while True:
 			if (event.button == 5) and (modal == True) and (modal_context == 'scoreboards') and (len(hi_scores.keys()) > 1):
 				next_scoreboard()
 
-		# Up/Down cycle scoreboards
+		# Up/Down cycle scoreboards/game difficulty
 		elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_UP) and (modal_context == 'scoreboards'):
 			previous_scoreboard()
 		elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_DOWN) and (modal_context == 'scoreboards'):
 			next_scoreboard()
+		elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_UP) and (modal_context == 'choose_difficulty'):
+			previous_option()
+		elif (event.type == pygame.KEYDOWN) and (event.key == pygame.K_DOWN) and (modal_context == 'choose_difficulty'):
+			next_option()
 
 		# Keydown event (making sure our key id is within character evaluation range)
 		elif ((event.type == pygame.KEYDOWN) and (event.key < 256)):
@@ -390,6 +463,8 @@ while True:
 					current_user_temp = current_user
 					modal = False
 					modal_context = ''
+				if (event.key == pygame.K_RETURN) and (modal_context == 'choose_difficulty'):
+					set_difficulty(highlighted)
 
 			# Game Over logic
 			elif game_over:
@@ -402,7 +477,7 @@ while True:
 				elif key_pressed == 'n':
 					sys.exit(0) 
 
-			# In game logic
+			# In game keypress logic
 			elif key_pressed in 'abcdefghijklmnopqrstuvwxyz':
 
 				# Correct guess
