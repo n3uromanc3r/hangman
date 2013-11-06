@@ -15,6 +15,7 @@ Features
 * SuperAwesome Sound FX!™
 * All new artwork
 * Leaderboards
+* Difficulty selection
 
 Assets
 =======
@@ -40,5 +41,5 @@ TODO
 =======
 
 * Extend scoring system to include online leaderboards
-* Add word-type selection on start-up (maintain separate wordlist files)
+* Add word-type selection as an in-game option via new button
 * Add more words (online dictionary?)
