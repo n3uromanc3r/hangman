@@ -32,8 +32,8 @@ Requirements
 
 You will need to install Python (2.x) and the Pygame library on your system, before being able to run this game.  If you run a flavour of Linux, these will most likely be available in the repos.  If not, you can get the necessary files here...
 
-(1) http://www.python.org/getit/
-(2) http://www.pygame.org/download.shtml
+1. http://www.python.org/getit/
+2. http://www.pygame.org/download.shtml
 
 
 TODO
