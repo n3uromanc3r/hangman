@@ -160,10 +160,13 @@ def draw_screen():
 		global volume
 		sound_icon = ('sound-off.png' if play_sounds else 'sound-on-over.png') if (target == 'sound_switch') else ('sound-on.png' if play_sounds else 'sound-off.png')
 		volume = pygame.image.load(images_dir+sound_icon).convert_alpha()
-		background.blit(volume, (570,438))
+		background.blit(volume, (540,438))
 		score_icon = 'score-over.png' if (target == 'scoreboards') else 'score.png'
 		score = pygame.image.load(images_dir+score_icon).convert_alpha()
-		background.blit(score, (600,438))
+		background.blit(score, (570,438))
+		difficulty_icon = 'difficulty-over.png' if (target == 'difficulty') else 'difficulty.png'
+		difficulty = pygame.image.load(images_dir+difficulty_icon).convert_alpha()
+		background.blit(difficulty, (600,438))
 
 	# Display title	
 	context = "Won" if won else "Lost"
@@ -187,7 +190,7 @@ def draw_screen():
 	time_text = "{0:02}:{1:02}:{2:02}".format(minutes,seconds, milliseconds)
 	if (frame_count > 0):
 		time = font2.render(time_text,True,(60,60,60))
-		background.blit(time, (490,440))
+		background.blit(time, (460,440))
 
 	# Blit what we have so far to the window
 	window.blit(background, (0, 0))
@@ -206,10 +209,12 @@ def draw_screen():
 def get_mouse_target():
 	global highlighted
 	mouse_pos = pygame.mouse.get_pos()
-	if pygame.Rect(570,438,24,24).collidepoint(mouse_pos):
+	if pygame.Rect(540,438,24,24).collidepoint(mouse_pos):
 		return 'sound_switch'
-	if pygame.Rect(600,438,24,24).collidepoint(mouse_pos):
+	if pygame.Rect(570,438,24,24).collidepoint(mouse_pos):
 		return 'scoreboards'
+	if pygame.Rect(600,438,24,24).collidepoint(mouse_pos):
+		return 'difficulty'
 	if pygame.Rect(285, 165, 70, 31).collidepoint(mouse_pos):
 		highlighted = 'random'
 		return 'random'
@@ -418,7 +423,10 @@ while True:
 				# Clicked scoreboards button
 				if target == 'scoreboards':
 					modal = True
-					modal_context = 'scoreboards'	
+					modal_context = 'scoreboards'
+				if target == 'difficulty':
+					modal = True
+					modal_context = 'choose_difficulty'
 				if target in difficulties:
 					set_difficulty(str(target))
 
