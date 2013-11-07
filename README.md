@@ -15,7 +15,7 @@ Features
 * SuperAwesome Sound FX!™
 * All new artwork
 * Leaderboards
-* Difficulty selection
+* Varying game difficulties - choose from Easy, Medium and Hard
 * Multi-platform - runs on Linux, OSX, BSD and Windows
 
 Assets
@@ -34,7 +34,7 @@ Requirements
 
 You will need to install Python (2.x) and the Pygame library on your system, before being able to run this game.  
 
-If you run a flavour of Linux, these will most likely be available in the repos.  If not, you can get the necessary files here...
+If these packages are not available via your OSes software repositories, you can get the necessary files here...
 
 1. http://www.python.org/getit/
 2. http://www.pygame.org/download.shtml
@@ -44,5 +44,4 @@ TODO
 =======
 
 * Extend scoring system to include online leaderboards
-* Add word-type selection as an in-game option via new button
 * Add more words (online dictionary?)
