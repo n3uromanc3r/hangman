@@ -45,3 +45,4 @@ TODO
 
 * Extend scoring system to include online leaderboards
 * Add more words (online dictionary?)
+* Re-sort wordlists, not all short words are easy and vice versa!
